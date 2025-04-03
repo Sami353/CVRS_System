@@ -1,0 +1,54 @@
+.view-hospitals {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 20px;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+  }
+  
+  .view-hospitals h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.8em;
+    color: #333;
+  }
+  
+  .view-hospitals table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+  }
+  
+  .view-hospitals table th,
+  .view-hospitals table td {
+    padding: 10px 15px;
+    text-align: left;
+    border: 1px solid #ddd;
+  }
+  
+  .view-hospitals table th {
+    background-color: #007bff;
+    color: #fff;
+    font-size: 1em;
+  }
+  
+  .view-hospitals table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+  
+  .view-hospitals table tr:hover {
+    background-color: #e6f7ff;
+  }
+  
+  .view-hospitals table td {
+    font-size: 0.9em;
+    color: #555;
+  }
+  
+  .view-hospitals p {
+    text-align: center;
+    font-size: 1.1em;
+    color: #888;
+  }
+  
