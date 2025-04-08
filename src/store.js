@@ -1,18 +1,30 @@
-import { legacy_createStore as createStore } from 'redux'
+import { legacy_createStore as createStore } from "redux";
 
 const initialState = {
   sidebarShow: true,
-  theme: 'light',
-}
+  theme: "light",
+
+  user: {
+    name: "Guest",
+    role: "client",
+  },
+};
 
 const changeState = (state = initialState, { type, ...rest }) => {
   switch (type) {
-    case 'set':
-      return { ...state, ...rest }
-    default:
-      return state
-  }
-}
+    case "set":
+      return { ...state, ...rest };
 
-const store = createStore(changeState)
-export default store
+    case "SET_USER": {
+      // to avoid accidentally passing other non user fields
+      const { name, role } = rest;
+      return { ...state, user: { name, role } };
+    }
+
+    default:
+      return state;
+  }
+};
+
+const store = createStore(changeState);
+export default store;

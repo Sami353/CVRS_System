@@ -1,11 +1,15 @@
-import React, { Suspense } from 'react'
-import { Navigate, Route, Routes } from 'react-router-dom'
-import { CContainer, CSpinner } from '@coreui/react'
+import React, { Suspense } from "react";
+import { Navigate, Route, Routes } from "react-router-dom";
+import { CContainer, CSpinner } from "@coreui/react";
 
 // routes config
-import routes from '../routes'
+import { useSelector } from "react-redux";
+import {adminRoutes, clientRoutes} from "../routes";
 
 const AppContent = () => {
+  const user = useSelector((state) => state.user);
+  const routes = user?.role === "admin" ? adminRoutes : clientRoutes;
+
   return (
     <CContainer className="px-4" lg>
       <Suspense fallback={<CSpinner color="primary" />}>
@@ -21,13 +25,13 @@ const AppContent = () => {
                   element={<route.element />}
                 />
               )
-            )
+            );
           })}
           <Route path="/" element={<Navigate to="dashboard" replace />} />
         </Routes>
       </Suspense>
     </CContainer>
-  )
-}
+  );
+};
 
-export default React.memo(AppContent)
+export default React.memo(AppContent);
