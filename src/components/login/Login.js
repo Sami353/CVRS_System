@@ -16,28 +16,38 @@ import {
 import CIcon from "@coreui/icons-react";
 import { cilLockLocked, cilUser } from "@coreui/icons";
 import { useDispatch } from "react-redux";
+import supabase from "../../config/supabaseClient"; 
+import { toast, ToastContainer } from 'react-toastify'; 
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
-  const handleLogin = () => {
-    // call some api or something here, this is only dummy auth
-    // type username as admin, to login as admin
-    const user = {
-      name: username,
-      role: username === 'admin' ? 'admin' : 'client',
+  const handleLogin = async () => {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        toast.error("Login failed: " + error.message);  // 👈 Show error toast
+        return;
+      }
+
+      const user = data.user;
+
+      dispatch({ type: 'SET_USER', payload: { name: user.email, role: 'client' } });
+      toast.success("Login successful!");  
+      navigate('/dashboard');
+    } catch (err) {
+      console.error(err);
+      toast.error("Unexpected error during login."); 
     }
-
-    console.log("handle login called");
-
-    dispatch({ type: 'SET_USER', ...user })
-    navigate('/dashboard')
-  }
-
+  };
 
   return (
     <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
@@ -54,20 +64,20 @@ const Login = () => {
                     }}
                   >
                     <h1>Login</h1>
-                    <p className="text-body-secondary">
-                      Sign In to your account
-                    </p>
+                    <p className="text-body-secondary">Sign In to your account</p>
+
                     <CInputGroup className="mb-3">
                       <CInputGroupText>
                         <CIcon icon={cilUser} />
                       </CInputGroupText>
                       <CFormInput
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                        placeholder="Username"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
+                        placeholder="Email"
                         autoComplete="username"
                       />
                     </CInputGroup>
+
                     <CInputGroup className="mb-4">
                       <CInputGroupText>
                         <CIcon icon={cilLockLocked} />
@@ -80,6 +90,7 @@ const Login = () => {
                         autoComplete="current-password"
                       />
                     </CInputGroup>
+
                     <CRow>
                       <CCol xs={6}>
                         <CButton type="submit" color="primary" className="px-4">
@@ -87,43 +98,40 @@ const Login = () => {
                         </CButton>
                       </CCol>
                       <CCol xs={6} className="text-right">
-                        <CButton color="link" className="px-0">
-                          Forgot password?
-                        </CButton>
+                      <Link to="/forgot-password">
+                          <CButton color="link" className="px-0">
+                            Forgot password?
+                          </CButton>
+                        </Link>
                       </CCol>
                     </CRow>
                   </CForm>
                 </CCardBody>
               </CCard>
-              <CCard
-                className="text-white bg-primary py-5"
-                style={{ width: "44%" }}
-              >
+
+              <CCard className="text-white bg-primary py-5" style={{ width: "44%" }}>
                 <CCardBody className="text-center">
                   <div>
                     <h2>Sign up</h2>
                     <p>
-                      Lorem ipsum dolor sit amet, consectetur adipisicing elit,
-                      sed do eiusmod tempor incididunt ut labore et dolore magna
-                      aliqua.
+                      Don't have an account? Register now to access our services.
                     </p>
                     <Link to="/register">
-                      <CButton
-                        color="primary"
-                        className="mt-3"
-                        active
-                        tabIndex={-1}
-                      >
+                      <CButton color="primary" className="mt-3" active tabIndex={-1}>
                         Register Now!
                       </CButton>
                     </Link>
                   </div>
                 </CCardBody>
               </CCard>
+
             </CCardGroup>
           </CCol>
         </CRow>
       </CContainer>
+
+      {/* Toastify Container */}
+      <ToastContainer position="top-right" autoClose={5000} hideProgressBar={false} newestOnTop={false} closeOnClick rtl={false} pauseOnFocusLoss draggable pauseOnHover />
     </div>
   );
 };
