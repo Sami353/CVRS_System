@@ -172,27 +172,50 @@ const Register = () => {
     return true;
   }
 
+  // const handleRegister = async (e) => {
+  //   e.preventDefault()
+
+  //   // Run validation
+  //   if (!validateForm()) {
+  //     return;  
+  //   }
+
+  //   const { data, error } = await registerUser(
+  //     form.email,
+  //     form.password,
+  //     form.username
+  //   );
+    
+  //   if (error) {
+  //     toast.error('Error: ' + error.message) 
+  //   } else {
+  //     toast.success('Registration successful! Please check your email to confirm.')  // 👈 Success toast
+  //     console.log(data)
+  //   }
+  // }
+
   const handleRegister = async (e) => {
-    e.preventDefault()
-
-    // Run validation
+    e.preventDefault();
+  
     if (!validateForm()) {
-      return;  
+      return;
     }
-
+  
     const { data, error } = await registerUser(
       form.email,
       form.password,
-      form.username
+      form.username,
+      'user'
     );
-    
+  
     if (error) {
-      toast.error('Error: ' + error.message) 
+      toast.error('Error: ' + error.message);
     } else {
-      toast.success('Registration successful! Please check your email to confirm.')  // 👈 Success toast
-      console.log(data)
+      toast.success('Registration successful! Please check your email to confirm.');
+      console.log(data);
     }
-  }
+  };
+  
 
   return (
     <div className="bg-body-tertiary min-vh-100 d-flex flex-row align-items-center">
