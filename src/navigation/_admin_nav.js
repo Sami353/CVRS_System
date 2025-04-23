@@ -11,20 +11,20 @@ import { CNavGroup, CNavItem } from '@coreui/react'
 const _admin_nav = [
   {
     component: CNavItem,
-    name: 'Dashboard',
-    to: '/dashboard',
+    name: 'Admin Dashboard',
+    to: '/admin/dashboard',
     icon: <CIcon icon={cilSpeedometer} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
     name: 'Add Hospital',
-    to: '/addHospital',
+    to: '/admin/addHospital',
     icon: <CIcon icon={cilChild} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
     name: 'List of Hospitals',
-    to: '/listHospital',
+    to: '/admin/listHospital',
     icon: <CIcon icon={cilHospital} customClassName="nav-icon" />,
   },
 ]

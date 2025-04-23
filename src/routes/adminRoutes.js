@@ -1,8 +1,8 @@
 import React from 'react'
 
-const Dashboard = React.lazy(() => import('../views/admin/dashboard/Dashboard'))
-const listHospital = React.lazy(() => import('../views/admin/listHospital/listHospital'))
-const addHospital = React.lazy(() => import('../views/admin/addHospital/addHospital'))
+const Dashboard = React.lazy(() => import('../views/admin/dashboard/Dashboard.js'))
+const listHospital = React.lazy(() => import('../views/admin/listHospital/listHospital.js'))
+const addHospital = React.lazy(() => import('../views/admin/addHospital/addHospital.js'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },

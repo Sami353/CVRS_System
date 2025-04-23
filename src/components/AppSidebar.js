@@ -25,9 +25,9 @@ const AppSidebar = () => {
   const sidebarShow = useSelector((state) => state.sidebarShow);
 
   // can be client or admin
-  let userRole = useSelector((state) => state.user?.role)
-  userRole = "admin";
+  const userRole = useSelector((state) => state.user?.role);
   const navItems = userRole === "admin" ? admin_navbar : client_navbar;
+
 
   return (
     <CSidebar

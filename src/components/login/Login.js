@@ -28,24 +28,44 @@ const Login = () => {
 
   const handleLogin = async () => {
     try {
-      const { data, error } = await supabase.auth.signInWithPassword({
+      // 1. Sign in
+      const { data: authData, error: authError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
-      if (error) {
-        toast.error("Login failed: " + error.message);  // 👈 Show error toast
+      if (authError) {
+        toast.error("Login failed: " + authError.message);
         return;
       }
 
-      const user = data.user;
+      const user = authData.user;
 
-      dispatch({ type: 'SET_USER', payload: { name: user.email, role: 'client' } });
-      toast.success("Login successful!");  
+      // 2. Fetch profile details
+      const { data: profile, error: profileError } = await supabase
+        .from('profiles')
+        .select('username, role')
+        .eq('id', user.id) // Match on the authenticated user's ID
+        .single();
+
+      if (profileError) {
+        toast.error("Failed to fetch profile: " + profileError.message);
+        return;
+      }
+
+      // 3. Dispatch to Redux
+      dispatch({
+        type: 'SET_USER',
+        name: profile.username,
+        role: profile.role,
+      });
+
+      toast.success("Login successful!");
       navigate('/dashboard');
+
     } catch (err) {
       console.error(err);
-      toast.error("Unexpected error during login."); 
+      toast.error("Unexpected error during login.");
     }
   };
 

@@ -47,7 +47,7 @@ import avatar6 from '../../../assets/images/avatars/6.jpg'
 
 import WidgetsDropdown from '../../../components/widgets/WidgetsDropdown'
 
-const Dashboard = () => {
+const adminDashboard = () => {
 
   const progressGroupExample1 = [
     { title: 'Monday', value1: 34, value2: 78 },
@@ -180,4 +180,4 @@ const Dashboard = () => {
   )
 }
 
-export default Dashboard
+export default adminDashboard
