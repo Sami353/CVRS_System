@@ -3,10 +3,10 @@ import React from 'react'
 const Dashboard = React.lazy(() => import('../views/client/dashboard/Dashboard'))
 const childRegister = React.lazy(() => import('../views/client/childRegister/childRegister'))
 const listHospital = React.lazy(() => import('../views/client/listHospital/listHospital'))
-const addHospital = React.lazy(() =>('../views/client/addHospital/addHospital'))
-const addVaccine = React.lazy(()=>('../views/client/addVaccine/addVaccine'))
-const listVaccine = React.lazy(()=>('../views/client/listVaccine/listVaccine'))
-const listChild = React.lazy(() =>('../views/client/listChild/listChild'))
+const addHospital = React.lazy(() => import('../views/client/addHospital/addHospital'))
+const addVaccine = React.lazy(()=> import('../views/client/addVaccine/addVaccine'))
+const listVaccine = React.lazy(()=> import('../views/client/listVaccine/listVaccine'))
+const listChild = React.lazy(() => import('../views/client/listChild/listChild'))
 
 const routes = [
   { path: '/', exact: true, name: 'Home' },
