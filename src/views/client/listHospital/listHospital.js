@@ -1,5 +1,4 @@
-import React from 'react'
-
+import React, { useState, useEffect } from 'react'
 import {
   CAvatar,
   CCard,
@@ -9,102 +8,113 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
-  CButton
+  CButton,
+  CRow,
+  CCol
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import {
-  cilPeople,
-} from '@coreui/icons'
+import { cilHospital } from '@coreui/icons'
+import supabase from '../../../config/supabaseClient'
 
-import avatar1 from '../../../assets/images/avatars/1.jpg'
-import avatar2 from '../../../assets/images/avatars/2.jpg'
-import avatar3 from '../../../assets/images/avatars/3.jpg'
-import avatar4 from '../../../assets/images/avatars/4.jpg'
-import avatar5 from '../../../assets/images/avatars/5.jpg'
-import avatar6 from '../../../assets/images/avatars/6.jpg'
+const ListHospitals = () => {
+  const [hospitals, setHospitals] = useState([])
 
+  // Fetch hospitals data from Supabase
+  const fetchHospitals = async () => {
+    const { data, error } = await supabase
+      .from('hospitals')
+      .select('*')
+      .order('created_at', { ascending: false })
 
-const listHospital = () => {
-  const tableExample = [
-    {
-      avatar: { src: avatar1, status: 'success' },
-      user: {
-        name: 'Yiorgos Avraamu',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-    },
-    {
-      avatar: { src: avatar2, status: 'danger' },
-      user: {
-        name: 'Avram Tarasios',
-        new: false,
-        registered: 'Jan 1, 2023',
-      },
-    },
-    {
-      avatar: { src: avatar3, status: 'warning' },
-      user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2023' },
-    },
-    {
-      avatar: { src: avatar4, status: 'secondary' },
-      user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2023' },
-    },
-    {
-      avatar: { src: avatar5, status: 'success' },
-      user: {
-        name: 'Agapetus Tadeáš',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-    },
-    {
-      avatar: { src: avatar6, status: 'danger' },
-      user: {
-        name: 'Friderik Dávid',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-    },
-  ]
-  
+    if (error) {
+      console.error('Error fetching hospitals:', error)
+    } else {
+      setHospitals(data)
+    }
+  }
+
+  // Handle delete operation
+  const handleDelete = async (id) => {
+    const { error } = await supabase
+      .from('hospitals')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('Error deleting hospital:', error)
+    } else {
+      // Remove the deleted hospital from state
+      setHospitals(hospitals.filter(hospital => hospital.id !== id))
+    }
+  }
+
+  useEffect(() => {
+    fetchHospitals() // Fetch hospitals data when component mounts
+  }, [])
+
   return (
     <>
-      <CCard>
-        <CTable align="middle" className="mb-0 border" hover responsive>
-          <CTableHead className="text-nowrap">
-            <CTableRow>
-              <CTableHeaderCell className="bg-body-tertiary text-center">
-                <CIcon icon={cilPeople} />
-              </CTableHeaderCell>
-              <CTableHeaderCell className="bg-body-tertiary">Hospitals</CTableHeaderCell>
-              <CTableHeaderCell className="bg-body-tertiary">Actions</CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {tableExample.map((item, index) => (
-              <CTableRow key={index}>
-                <CTableDataCell className="text-center">
-                  <CAvatar size="md" src={item.avatar.src} status={item.avatar.status} />
-                </CTableDataCell>
-                <CTableDataCell>
-                  <div>{item.user.name}</div>
-                  <div className="small text-body-secondary text-nowrap">
-                    <span>{item.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '}
-                    {item.user.registered}
-                  </div>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CButton color="primary" size="sm">View</CButton>
-                  <CButton color="danger" size="sm" className="ms-2">Delete</CButton>
-                </CTableDataCell>
-              </CTableRow>
-            ))}
-          </CTableBody>
-        </CTable>
-      </CCard>
+      <CRow>
+        <CCol xs={12}>
+          <CCard className="shadow-lg">
+            <CTable align="middle" className="mb-0 border" hover responsive>
+              <CTableHead className="text-nowrap bg-light">
+                <CTableRow>
+                  <CTableHeaderCell className="text-center">
+                    <CIcon icon={cilHospital} size="xl" />
+                  </CTableHeaderCell>
+                  <CTableHeaderCell>Hospital Name</CTableHeaderCell>
+                  <CTableHeaderCell>Address</CTableHeaderCell>
+                  <CTableHeaderCell>Contact No.</CTableHeaderCell>
+                  <CTableHeaderCell>No. of Children Registered</CTableHeaderCell>
+                  <CTableHeaderCell>Vaccines in Stock</CTableHeaderCell>
+                  <CTableHeaderCell>Vaccination Status</CTableHeaderCell>
+                  <CTableHeaderCell>Actions</CTableHeaderCell>
+                </CTableRow>
+              </CTableHead>
+              <CTableBody>
+                {hospitals.map((hospital, index) => (
+                  <CTableRow key={hospital.id}>
+                    <CTableDataCell className="text-center">
+                      <CAvatar
+                        size="md"
+                        src={hospital.avatar || 'https://via.placeholder.com/150'}
+                        status={hospital.vaccination_opt ? 'success' : 'danger'}
+                      />
+                    </CTableDataCell>
+                      <CTableDataCell>{hospital.hospital_name}</CTableDataCell>
+                      <CTableDataCell>{hospital.address}</CTableDataCell>
+                      <CTableDataCell>{hospital.contact_no}</CTableDataCell>
+                      <CTableDataCell>{hospital.children_registered}</CTableDataCell>
+                      <CTableDataCell>{hospital.vaccines_in_stock}</CTableDataCell>
+                      <CTableDataCell>{hospital.vaccination_opt ? 'Opted' : 'Not Opted'}
+                    </CTableDataCell>
+                    <CTableDataCell>
+                      <CButton
+                        color="primary"
+                        size="sm"
+                        className="me-2"
+                        onClick={() => alert(`View details for ${hospital.hospital_name}`)}
+                      >
+                        View
+                      </CButton>
+                      <CButton
+                        color="danger"
+                        size="sm"
+                        onClick={() => handleDelete(hospital.id)}
+                      >
+                        Delete
+                      </CButton>
+                    </CTableDataCell>
+                  </CTableRow>
+                ))}
+              </CTableBody>
+            </CTable>
+          </CCard>
+        </CCol>
+      </CRow>
     </>
   )
 }
 
-export default listHospital
+export default ListHospitals
