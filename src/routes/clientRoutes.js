@@ -1,13 +1,5 @@
 import React from 'react'
 
-// const Dashboard = React.lazy(() => import('../views/client/dashboard/Dashboard'))
-// const childRegister = React.lazy(() => import('../views/client/childRegister/childRegister'))
-// const listHospital = React.lazy(() => import('../views/client/listHospital/listHospital'))
-// const addHospital = React.lazy(() => import('../views/client/addHospital/addHospital'))
-// const addVaccine = React.lazy(()=> import('../views/client/addVaccine/addVaccine'))
-// const listVaccine = React.lazy(()=> import('../views/client/listVaccine/listVaccine'))
-// const listChild = React.lazy(() => import('../views/client/listChild/listChild'))
-
 const Dashboard = React.lazy(() => import('../views/client/dashboard/Dashboard.js'))
 const childRegister = React.lazy(() => import('../views/client/childRegister/childRegister.js'))
 const listHospital = React.lazy(() => import('../views/client/listHospital/listHospital.js'))
