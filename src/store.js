@@ -4,10 +4,12 @@ const initialState = {
   sidebarShow: true,
   theme: "light",
 
-  user: {
-    name: "Guest",
-    role: "client",
-  },
+  // user: {
+  //   name: "Guest",
+  //   role: "client",
+  // },
+
+  user: null,
 };
 
 const changeState = (state = initialState, { type, ...rest }) => {

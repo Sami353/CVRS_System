@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react'
 import {
   CAvatar,
   CCard,
+  CCardHeader,
   CTable,
   CTableBody,
   CTableDataCell,
@@ -10,7 +11,9 @@ import {
   CTableRow,
   CButton,
   CRow,
-  CCol
+  CCol,
+  CSpinner,
+  CBadge
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilHospital } from '@coreui/icons'
@@ -18,23 +21,31 @@ import supabase from '../../../config/supabaseClient'
 
 const ListHospitals = () => {
   const [hospitals, setHospitals] = useState([])
+  const [loading, setLoading] = useState(true)
 
-  // Fetch hospitals data from Supabase
+  // Fetch hospitals from Supabase
   const fetchHospitals = async () => {
+    setLoading(true);  // Show loading spinner
     const { data, error } = await supabase
       .from('hospitals')
       .select('*')
-      .order('created_at', { ascending: false })
-
+      .order('created_at', { ascending: false });
+  
     if (error) {
-      console.error('Error fetching hospitals:', error)
+      console.error('Error fetching hospitals:', error);  // Check for any errors
     } else {
-      setHospitals(data)
+      console.log('Fetched data:', data);  // Log fetched data
+      setHospitals(data);
     }
+    setLoading(false);  // Hide loading spinner
   }
+  
 
-  // Handle delete operation
+  // Handle hospital delete
   const handleDelete = async (id) => {
+    const confirm = window.confirm('Are you sure you want to delete this hospital?')
+    if (!confirm) return
+
     const { error } = await supabase
       .from('hospitals')
       .delete()
@@ -43,58 +54,65 @@ const ListHospitals = () => {
     if (error) {
       console.error('Error deleting hospital:', error)
     } else {
-      // Remove the deleted hospital from state
-      setHospitals(hospitals.filter(hospital => hospital.id !== id))
+      setHospitals(hospitals.filter(h => h.id !== id))
     }
   }
 
   useEffect(() => {
-    fetchHospitals() // Fetch hospitals data when component mounts
+    fetchHospitals()
   }, [])
 
   return (
-    <>
-      <CRow>
-        <CCol xs={12}>
-          <CCard className="shadow-lg">
-            <CTable align="middle" className="mb-0 border" hover responsive>
-              <CTableHead className="text-nowrap bg-light">
+    <CRow>
+      <CCol xs={12}>
+        <CCard className="shadow">
+          <CCardHeader className="fw-bold fs-5">List of Hospitals</CCardHeader>
+          {loading ? (
+            <div className="text-center p-4">
+              <CSpinner color="primary" />
+            </div>
+          ) : (
+            <CTable align="middle" hover responsive className="mb-0">
+              <CTableHead color="light">
                 <CTableRow>
                   <CTableHeaderCell className="text-center">
-                    <CIcon icon={cilHospital} size="xl" />
+                    <CIcon icon={cilHospital} />
                   </CTableHeaderCell>
                   <CTableHeaderCell>Hospital Name</CTableHeaderCell>
                   <CTableHeaderCell>Address</CTableHeaderCell>
                   <CTableHeaderCell>Contact No.</CTableHeaderCell>
-                  <CTableHeaderCell>No. of Children Registered</CTableHeaderCell>
+                  <CTableHeaderCell>Children Registered</CTableHeaderCell>
                   <CTableHeaderCell>Vaccines in Stock</CTableHeaderCell>
-                  <CTableHeaderCell>Vaccination Status</CTableHeaderCell>
+                  <CTableHeaderCell>Vaccination Facility</CTableHeaderCell>
                   <CTableHeaderCell>Actions</CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
               <CTableBody>
-                {hospitals.map((hospital, index) => (
+                {hospitals.map(hospital => (
                   <CTableRow key={hospital.id}>
                     <CTableDataCell className="text-center">
                       <CAvatar
                         size="md"
-                        src={hospital.avatar || 'https://via.placeholder.com/150'}
+                        src="https://via.placeholder.com/150"
                         status={hospital.vaccination_opt ? 'success' : 'danger'}
                       />
                     </CTableDataCell>
-                      <CTableDataCell>{hospital.hospital_name}</CTableDataCell>
-                      <CTableDataCell>{hospital.address}</CTableDataCell>
-                      <CTableDataCell>{hospital.contact_no}</CTableDataCell>
-                      <CTableDataCell>{hospital.children_registered}</CTableDataCell>
-                      <CTableDataCell>{hospital.vaccines_in_stock}</CTableDataCell>
-                      <CTableDataCell>{hospital.vaccination_opt ? 'Opted' : 'Not Opted'}
+                    <CTableDataCell>{hospital.hospital_name}</CTableDataCell>
+                    <CTableDataCell>{hospital.address}</CTableDataCell>
+                    <CTableDataCell>{hospital.contact_no}</CTableDataCell>
+                    <CTableDataCell>{hospital.children_registered}</CTableDataCell>
+                    <CTableDataCell>{hospital.vaccines_in_stock}</CTableDataCell>
+                    <CTableDataCell>
+                      <CBadge color={hospital.vaccination_opt ? 'success' : 'danger'}>
+                        {hospital.vaccination_opt ? 'Opted' : 'Not Opted'}
+                      </CBadge>
                     </CTableDataCell>
                     <CTableDataCell>
                       <CButton
-                        color="primary"
+                        color="info"
                         size="sm"
                         className="me-2"
-                        onClick={() => alert(`View details for ${hospital.hospital_name}`)}
+                        onClick={() => alert(`Viewing ${hospital.hospital_name}`)}
                       >
                         View
                       </CButton>
@@ -110,10 +128,10 @@ const ListHospitals = () => {
                 ))}
               </CTableBody>
             </CTable>
-          </CCard>
-        </CCol>
-      </CRow>
-    </>
+          )}
+        </CCard>
+      </CCol>
+    </CRow>
   )
 }
 

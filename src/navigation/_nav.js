@@ -1,6 +1,6 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import {cilHospital ,cilChild } from '@coreui/icons';
+import {cilHospital ,cilChild, cilChildFriendly } from '@coreui/icons';
 import {
   cilDescription,
   cilSpeedometer,
@@ -23,14 +23,14 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'List of Hospitals',
-    to: '/listHospital',
-    icon: <CIcon icon={cilHospital} customClassName="nav-icon" />,
+    name: 'List of Childs',
+    to: '/listChild',
+    icon: <CIcon icon={cilChildFriendly} customClassName="nav-icon" />,
   },
   {
     component: CNavItem,
-    name: 'List of childs',
-    to: '/listChild',
+    name: 'List of Hospitals',
+    to: '/listHospital',
     icon: <CIcon icon={cilHospital} customClassName="nav-icon" />,
   },
 ]

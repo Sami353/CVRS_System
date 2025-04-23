@@ -205,7 +205,7 @@ const Register = () => {
       form.email,
       form.password,
       form.username,
-      'user'
+      'client'
     );
   
     if (error) {
