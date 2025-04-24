@@ -23,7 +23,7 @@ const _nav = [
   },
   {
     component: CNavItem,
-    name: 'List of Childs',
+    name: 'List of Children',
     to: '/listChild',
     icon: <CIcon icon={cilChildFriendly} customClassName="nav-icon" />,
   },
