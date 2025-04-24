@@ -39,7 +39,6 @@ const ListHospitals = () => {
     }
     setLoading(false);  // Hide loading spinner
   }
- 
 
   // Handle hospital delete
   const handleDelete = async (id) => {
