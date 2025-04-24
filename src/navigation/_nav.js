@@ -1,12 +1,10 @@
 import React from 'react'
 import CIcon from '@coreui/icons-react'
-import {cilHospital ,cilChild, cilChildFriendly } from '@coreui/icons';
+import {cilHospital ,cilChild, cilChildFriendly, cibLivejournal } from '@coreui/icons';
 import {
-  cilDescription,
   cilSpeedometer,
-  cilStar,
 } from '@coreui/icons'
-import { CNavGroup, CNavItem } from '@coreui/react'
+import { CNavItem } from '@coreui/react'
 
 const _nav = [
   {
@@ -32,6 +30,12 @@ const _nav = [
     name: 'List of Hospitals',
     to: '/listHospital',
     icon: <CIcon icon={cilHospital} customClassName="nav-icon" />,
+  },
+  {
+    component: CNavItem,
+    name: 'List of Vaccines',
+    to: '/listVaccine',
+    icon: <CIcon icon={cibLivejournal} customClassName="nav-icon" />,
   },
 ]
 

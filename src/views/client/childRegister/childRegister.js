@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import {
-  CButton, CCol, CForm, CFormCheck, CFormInput, CFormSelect, CRow, CCard, CCardHeader
+  CButton, CCol, CForm, CFormInput, CRow, CCard, CCardHeader
 } from '@coreui/react'
 import supabase from '../../../config/supabaseClient'
 import { toast } from 'react-toastify'
@@ -14,7 +14,7 @@ const ChildRegister = () => {
   const [hospitalName, setHospitalName] = useState('')
 
   const handleSubmit = async () => {
-    const { data, error } = await supabase.from('childrens').insert([
+    const { data, error } = await supabase.from('children').insert([
       {
         child_name: childName,
         guardian_name: guardianName,
