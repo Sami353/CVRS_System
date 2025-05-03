@@ -8,20 +8,6 @@ import DefaultLayout from "./layout/DefaultLayout.js";
 import PrivateRoute from './components/PrivateRoute'; 
 
 function App() {
-
-  // return (
-  //   <Router>
-  //     <Routes>
-  //       <Route exact path="/login" name="Login Page" element={<Login />} />
-  //       <Route exact path="/register" name="Register Page" element={<Register />} />
-  //       <Route path="/forgot-password" element={<ForgotPassword />} />
-  //       <Route path="*" name="Home" element={<DefaultLayout />} />
-
-  //     </Routes>
-  //   </Router>
-  // );
-
-
   return (
     <Router>
       <Routes>
@@ -45,3 +31,5 @@ function App() {
 }
 
 export default App;
+
+

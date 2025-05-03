@@ -1,5 +1,4 @@
-import React from 'react'
-
+import React, { useEffect, useState } from 'react'
 import {
   CAvatar,
   CCard,
@@ -9,102 +8,91 @@ import {
   CTableHead,
   CTableHeaderCell,
   CTableRow,
-  CButton
+  CButton,
+  CCol,
+  CRow
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import {
-  cilPeople,
-} from '@coreui/icons'
+import { cilPeople } from '@coreui/icons'
 
-import avatar1 from '../../../assets/images/avatars/1.jpg'
-import avatar2 from '../../../assets/images/avatars/2.jpg'
-import avatar3 from '../../../assets/images/avatars/3.jpg'
-import avatar4 from '../../../assets/images/avatars/4.jpg'
-import avatar5 from '../../../assets/images/avatars/5.jpg'
-import avatar6 from '../../../assets/images/avatars/6.jpg'
+import supabase from '../../../config/supabaseClient'
 
+const ListChildren = () => {
+  const [children, setChildren] = useState([])
 
-const listHospital = () => {
-  const tableExample = [
-    {
-      avatar: { src: avatar1, status: 'success' },
-      user: {
-        name: 'Yiorgos Avraamu',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-    },
-    {
-      avatar: { src: avatar2, status: 'danger' },
-      user: {
-        name: 'Avram Tarasios',
-        new: false,
-        registered: 'Jan 1, 2023',
-      },
-    },
-    {
-      avatar: { src: avatar3, status: 'warning' },
-      user: { name: 'Quintin Ed', new: true, registered: 'Jan 1, 2023' },
-    },
-    {
-      avatar: { src: avatar4, status: 'secondary' },
-      user: { name: 'Enéas Kwadwo', new: true, registered: 'Jan 1, 2023' },
-    },
-    {
-      avatar: { src: avatar5, status: 'success' },
-      user: {
-        name: 'Agapetus Tadeáš',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-    },
-    {
-      avatar: { src: avatar6, status: 'danger' },
-      user: {
-        name: 'Friderik Dávid',
-        new: true,
-        registered: 'Jan 1, 2023',
-      },
-    },
-  ]
-  
+  const fetchChildren = async () => {
+    const { data, error } = await supabase
+      .from('children')
+      .select('*')
+      .order('sn', { ascending: true })
+
+    if (error) {
+      console.error('Error fetching children:', error)
+    } else {
+      setChildren(data)
+    }
+  }
+
+  const handleDelete = async (sn) => {
+    const { error } = await supabase
+      .from('children')
+      .delete()
+      .eq('sn', sn)
+
+    if (error) {
+      console.error('Delete error:', error)
+    } else {
+      setChildren(children.filter(child => child.sn !== sn))
+    }
+  }
+
+  useEffect(() => {
+    fetchChildren()
+  }, [])
+
   return (
-    <>
-      <CCard>
-        <CTable align="middle" className="mb-0 border" hover responsive>
-          <CTableHead className="text-nowrap">
-            <CTableRow>
-              <CTableHeaderCell className="bg-body-tertiary text-center">
-                <CIcon icon={cilPeople} />
-              </CTableHeaderCell>
-              <CTableHeaderCell className="bg-body-tertiary">Child</CTableHeaderCell>
-              <CTableHeaderCell className="bg-body-tertiary">Actions</CTableHeaderCell>
-            </CTableRow>
-          </CTableHead>
-          <CTableBody>
-            {tableExample.map((item, index) => (
-              <CTableRow key={index}>
-                <CTableDataCell className="text-center">
-                  <CAvatar size="md" src={item.avatar.src} status={item.avatar.status} />
-                </CTableDataCell>
-                <CTableDataCell>
-                  <div>{item.user.name}</div>
-                  <div className="small text-body-secondary text-nowrap">
-                    <span>{item.user.new ? 'New' : 'Recurring'}</span> | Registered:{' '}
-                    {item.user.registered}
-                  </div>
-                </CTableDataCell>
-                <CTableDataCell>
-                  <CButton color="primary" size="sm">View</CButton>
-                  <CButton color="danger" size="sm" className="ms-2">Delete</CButton>
-                </CTableDataCell>
+    <CRow>
+      <CCol xs={12}>
+        <CCard className="shadow-sm p-3">
+          <CTable align="middle" className="mb-0 border" hover responsive>
+            <CTableHead className="bg-light">
+              <CTableRow>
+                <CTableHeaderCell className="text-center"><CIcon icon={cilPeople} /></CTableHeaderCell>
+                <CTableHeaderCell>Child Name</CTableHeaderCell>
+                <CTableHeaderCell>Guardian Name</CTableHeaderCell>
+                <CTableHeaderCell>Guardian No.</CTableHeaderCell>
+                <CTableHeaderCell>Age</CTableHeaderCell>
+                <CTableHeaderCell>Vaccinated</CTableHeaderCell>
+                <CTableHeaderCell>Hospital</CTableHeaderCell>
+                <CTableHeaderCell>Actions</CTableHeaderCell>
               </CTableRow>
-            ))}
-          </CTableBody>
-        </CTable>
-      </CCard>
-    </>
+            </CTableHead>
+            <CTableBody>
+              {children.map((child) => (
+                <CTableRow key={child.sn}>
+                  <CTableDataCell className="text-center">
+                    <CAvatar size="md" src="https://via.placeholder.com/150" />
+                  </CTableDataCell>
+                  <CTableDataCell>{child.child_name}</CTableDataCell>
+                  <CTableDataCell>{child.guardian_name}</CTableDataCell>
+                  <CTableDataCell>{child.guardian_number}</CTableDataCell>
+                  <CTableDataCell>{child.child_age}</CTableDataCell>
+                  <CTableDataCell>
+                    {Array.isArray(child.vaccinated) ? child.vaccinated.join(', ') : (child.vaccinated || 'No')}
+                  </CTableDataCell>
+                  <CTableDataCell>{child.hospital_name}</CTableDataCell>
+                  <CTableDataCell>
+                    <CButton size="sm" color="primary" className="me-2">View</CButton>
+                    <CButton size="sm" color="danger" onClick={() => handleDelete(child.sn)}>Delete</CButton>
+                  </CTableDataCell>
+                </CTableRow>
+              ))}
+            </CTableBody>
+          </CTable>
+        </CCard>
+      </CCol>
+    </CRow>
   )
 }
 
-export default listHospital
+export default ListChildren

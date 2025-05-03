@@ -19,6 +19,7 @@ import { useDispatch } from "react-redux";
 import supabase from "../../config/supabaseClient"; 
 import { toast, ToastContainer } from 'react-toastify'; 
 import 'react-toastify/dist/ReactToastify.css';
+import routes from "../../routes/adminRoutes";
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -60,7 +61,12 @@ const Login = () => {
         role: profile.role,
       });
 
+
       toast.success("Login successful!");
+      if(profile.role === "admin") {
+         return navigate('/admin/dashboard');
+      }
+
       navigate('/dashboard');
 
     } catch (err) {
