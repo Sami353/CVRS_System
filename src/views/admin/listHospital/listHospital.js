@@ -13,23 +13,21 @@ import {
   CRow,
   CCol,
   CSpinner,
-  CBadge,
-  CModal,
-  CModalHeader,
-  CModalBody,
-  CModalFooter
+  CBadge
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
-import { cilHospital, cilPeople } from '@coreui/icons'
+import { cilHospital } from '@coreui/icons'
 import supabase from '../../../config/supabaseClient'
+import HospitalDetailsModal from '../HospitalDetailsModal/HospitalDetailsModal' // import reusable modal
 
 const ListHospitals = () => {
   const [hospitals, setHospitals] = useState([])
   const [loading, setLoading] = useState(true)
   const [modalOpen, setModalOpen] = useState(false)
   const [selectedHospital, setSelectedHospital] = useState(null)
+  const [children, setChildren] = useState([])
 
-  // Fetch hospitals from Supabase
+  // Fetch hospitals
   const fetchHospitals = async () => {
     setLoading(true)
     const { data, error } = await supabase
@@ -45,7 +43,7 @@ const ListHospitals = () => {
     setLoading(false)
   }
 
-  // Handle hospital delete
+  // Delete hospital
   const handleDelete = async (id) => {
     const confirm = window.confirm('Are you sure you want to delete this hospital?')
     if (!confirm) return
@@ -62,17 +60,12 @@ const ListHospitals = () => {
     }
   }
 
-  useEffect(() => {
-    fetchHospitals()
-  }, [])
-
-  const [children, setChildren] = useState([])
-
+  // Fetch children for modal
   const fetchChildren = async (hospitalId) => {
     const { data, error } = await supabase
       .from('children')
       .select('*')
-      .eq('hospital_id', hospitalId) // filter by selected hospital
+      .eq('hospital_id', hospitalId)
       .order('sn', { ascending: true })
 
     if (error) {
@@ -81,6 +74,28 @@ const ListHospitals = () => {
       setChildren(data)
     }
   }
+
+  // Handle deleting a child in the modal
+  const handleDeleteChild = async (childId) => {
+    const confirm = window.confirm('Are you sure you want to delete this child?')
+    if (!confirm) return
+
+    const { error } = await supabase
+      .from('children')
+      .delete()
+      .eq('sn', childId)
+
+    if (error) {
+      console.error('Error deleting child:', error)
+    } else {
+      // Remove the deleted child from the children list
+      setChildren(children.filter(child => child.sn !== childId))
+    }
+  }
+
+  useEffect(() => {
+    fetchHospitals()
+  }, [])
 
   return (
     <>
@@ -158,112 +173,14 @@ const ListHospitals = () => {
         </CCol>
       </CRow>
 
-      {/* Popup Modal */}
-      <CModal
+      {/* Reusable Modal */}
+      <HospitalDetailsModal
         visible={modalOpen}
         onClose={() => setModalOpen(false)}
-        size="xl"
-        backdrop="static"
-        alignment="center"
-        scrollable
-      >
-        <div style={{
-          minHeight: '80vh',
-          padding: '20px',
-          borderRadius: '10px',
-          color: 'black',
-        }}>
-          <CModalHeader>
-            <strong>{selectedHospital?.hospital_name || 'Hospital Info'}</strong>
-          </CModalHeader>
-          <CModalBody>
-            <CRow className="text-white">
-              <CCol md={6} className="mb-3">
-                <label className="form-label" style={{ color: 'black' }}>Hospital Name</label>
-                <input type="text" className="form-control" value={selectedHospital?.hospital_name || ''} readOnly />
-              </CCol>
-              <CCol md={6} className="mb-3">
-                <label className="form-label" style={{ color: 'black' }}>Address</label>
-                <input type="text" className="form-control" value={selectedHospital?.address || ''} readOnly />
-              </CCol>
-              <CCol md={6} className="mb-3">
-                <label className="form-label" style={{ color: 'black' }}>Contact No.</label>
-                <input type="text" className="form-control" value={selectedHospital?.contact_no || ''} readOnly />
-              </CCol>
-              <CCol md={6} className="mb-3">
-                <label className="form-label" style={{ color: 'black' }}>Children Registered</label>
-                <input type="number" className="form-control" value={selectedHospital?.children_registered || ''} readOnly />
-              </CCol>
-              <CCol md={6} className="mb-3">
-                <label className="form-label" style={{ color: 'black' }}>Vaccines in Stock</label>
-                <input type="number" className="form-control" value={selectedHospital?.vaccines_in_stock || ''} readOnly />
-              </CCol>
-              <CCol md={6} className="mb-3">
-                <label className="form-label" style={{ color: 'black' }}>Vaccination Facility</label>
-                <input
-                  type="text"
-                  className="form-control"
-                  value={selectedHospital?.vaccination_opt ? 'Opted' : 'Not Opted'}
-                  readOnly
-                />
-              </CCol>
-            </CRow>
-            <CRow className="mt-4">
-              <CCol xs={12}>
-                <h5 className="mb-3" style={{ color: 'black' }}>Children Registered</h5>
-                <CCard className="shadow-sm p-3">
-                  <CTable align="middle" className="mb-0 border" hover responsive>
-                    <CTableHead className="bg-light">
-                      <CTableRow>
-                        <CTableHeaderCell className="text-center">
-                          <CIcon icon={cilPeople} />
-                        </CTableHeaderCell>
-                        <CTableHeaderCell>Child Name</CTableHeaderCell>
-                        <CTableHeaderCell>Guardian Name</CTableHeaderCell>
-                        <CTableHeaderCell>Guardian No.</CTableHeaderCell>
-                        <CTableHeaderCell>Age</CTableHeaderCell>
-                        <CTableHeaderCell>Vaccinated</CTableHeaderCell>
-                        <CTableHeaderCell>Actions</CTableHeaderCell>
-                      </CTableRow>
-                    </CTableHead>
-                    <CTableBody>
-                      {children.length > 0 ? (
-                        children.map((child) => (
-                          <CTableRow key={child.sn}>
-                            <CTableDataCell className="text-center">
-                              <CAvatar size="md" src="https://via.placeholder.com/150" />
-                            </CTableDataCell>
-                            <CTableDataCell>{child.child_name}</CTableDataCell>
-                            <CTableDataCell>{child.guardian_name}</CTableDataCell>
-                            <CTableDataCell>{child.guardian_number}</CTableDataCell>
-                            <CTableDataCell>{child.child_age}</CTableDataCell>
-                            <CTableDataCell>
-                              {Array.isArray(child.vaccinated)
-                                ? child.vaccinated.join(', ')
-                                : child.vaccinated || 'No'}
-                            </CTableDataCell>
-                            <CTableDataCell>
-                              <CButton size="sm" color="primary" className="me-2">View</CButton>
-                              <CButton size="sm" color="danger" onClick={() => handleDelete(child.sn)}>Delete</CButton>
-                            </CTableDataCell>
-                          </CTableRow>
-                        ))
-                      ) : (
-                        <CTableRow>
-                          <CTableDataCell colSpan={7} className="text-center">
-                            No children registered.
-                          </CTableDataCell>
-                        </CTableRow>
-                      )}
-                    </CTableBody>
-                  </CTable>
-                </CCard>
-              </CCol>
-            </CRow>
-          </CModalBody>
-
-        </div>
-      </CModal>
+        hospital={selectedHospital}
+        childrenList={children}
+        onDeleteChild={handleDeleteChild} 
+      />
     </>
   )
 }
