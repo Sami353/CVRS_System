@@ -1,66 +1,130 @@
-import React from 'react'
-
+import React, { useEffect, useState } from 'react'
 import {
-    CButton, CCol, CForm, CFormCheck, CFormInput, CFormSelect, CRow, CCard, CCardHeader
+  CButton,
+  CCol,
+  CForm,
+  CFormInput,
+  CFormSelect,
+  CRow,
+  CCard,
+  CCardHeader,
+  CCardBody,
 } from '@coreui/react'
+import supabase from '../../../config/supabaseClient'
 
-const childRegister = () => {
+const AddVaccine = () => {
+  const [hospitalId, setHospitalId] = useState(null)
+  const [vaccineId, setVaccineId] = useState('')
+  const [stockQuantity, setStockQuantity] = useState('')
+  const [vaccines, setVaccines] = useState([])
 
-    return (
-        <>
-            <CRow>
-                <CCol xs>
-                    <CCard className="mb-4 p-4">
-                        <CCardHeader>Add Vaccine</CCardHeader>
-                        <CForm className="row g-3">
-                            <CCol md={6}>
-                                <CFormInput type="text" id="inputName" label="First Name" />
-                            </CCol>
-                            <CCol md={6}>
-                                <CFormInput type="text" id="inputName" label="Last Name" />
-                            </CCol>
-                            <CCol md={6}>
-                                <CFormInput type="text" id="inputName" label="Parent Name" />
-                            </CCol>
-                            <CCol md={6}>
-                                <CFormInput type="password" id="inputPassword4" label="Password" />
-                            </CCol>
-                            <CCol xs={12}>
-                                <CFormInput id="inputAddress" label="Address" placeholder="Kathmandu" />
-                            </CCol>
-                            <CCol xs={12}>
-                                <CFormInput
-                                    id="inputAddress2"
-                                    label="Address 2"
-                                    placeholder="Apartment, studio, or floor"
-                                />
-                            </CCol>
-                            <CCol md={6}>
-                                <CFormInput id="inputCity" label="City" />
-                            </CCol>
-                            <CCol md={4}>
-                                <CFormSelect id="inputState" label="State">
-                                    <option>Choose...</option>
-                                    <option>Bagmati</option>
-                                </CFormSelect>
-                            </CCol>
-                            <CCol md={2}>
-                                <CFormInput id="inputZip" label="Zip" />
-                            </CCol>
-                            <CCol xs={12}>
-                                <CFormCheck type="checkbox" id="gridCheck" label="Check me out" />
-                            </CCol>
-                            <CCol xs={12}>
-                                <CButton color="primary" type="submit">
-                                    Submit
-                                </CButton>
-                            </CCol>
-                        </CForm>
-                    </CCard>
-                </CCol>
-            </CRow>
-        </>
-    )
+  // Get hospital_id from logged in user's profile
+  const fetchUserHospitalId = async () => {
+    const { data: userResponse, error: userError } = await supabase.auth.getUser()
+    if (userError) {
+      console.error('User fetch error:', userError)
+      return
+    }
+
+    const user = userResponse?.user
+    if (user) {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('hospital_id')
+        .eq('id', user.id)
+        .single()
+      if (error) {
+        console.error('Error fetching hospital_id:', error)
+      } else {
+        setHospitalId(data.hospital_id)
+      }
+    }
+  }
+
+  // Fetch vaccine options
+  const fetchVaccines = async () => {
+    const { data, error } = await supabase.from('vaccines').select('id, vaccine_code_name')
+    if (error) {
+      console.error('Error fetching vaccines:', error)
+    } else {
+      setVaccines(data)
+    }
+  }
+
+  // Form submission handler
+  const handleSubmit = async (e) => {
+    e.preventDefault()
+    if (!vaccineId || !stockQuantity || !hospitalId) {
+      alert('Please fill in all fields.')
+      return
+    }
+
+    const { error } = await supabase.from('vaccine_detail').insert([
+      {
+        hospital_id: hospitalId,
+        vaccine_id: parseInt(vaccineId),
+        stock_quantity: parseInt(stockQuantity),
+      },
+    ])
+
+    if (error) {
+      console.error('Insert error:', error)
+      alert('Failed to add vaccine')
+    } else {
+      alert('Vaccine added successfully!')
+      setVaccineId('')
+      setStockQuantity('')
+    }
+  }
+
+  useEffect(() => {
+    fetchUserHospitalId()
+    fetchVaccines()
+  }, [])
+
+  return (
+    <CRow>
+      <CCol xs>
+        <CCard className="mb-4 p-4">
+          <CCardHeader>Add Vaccine Stock</CCardHeader>
+          <CCardBody>
+            <CForm onSubmit={handleSubmit} className="row g-3">
+              <CCol md={6}>
+                <CFormSelect
+                  id="vaccineSelect"
+                  label="Select Vaccine"
+                  value={vaccineId}
+                  onChange={(e) => setVaccineId(e.target.value)}
+                >
+                  <option value="">-- Select Vaccine --</option>
+                  {vaccines.map((vaccine) => (
+                    <option key={vaccine.id} value={vaccine.id}>
+                      {vaccine.vaccine_code_name}
+                    </option>
+                  ))}
+                </CFormSelect>
+              </CCol>
+              <CCol md={6}>
+                <CFormInput
+                  type="number"
+                  id="stockQuantity"
+                  label="Stock Quantity"
+                  value={stockQuantity}
+                  onChange={(e) => setStockQuantity(e.target.value)}
+                  min={0}
+                />
+              </CCol>
+              <CCol xs={12}>
+                <CButton color="primary" type="submit">
+                  Add Vaccine
+                </CButton>
+              </CCol>
+            </CForm>
+          </CCardBody>
+        </CCard>
+      </CCol>
+    </CRow>
+  )
 }
 
-export default childRegister
+export default AddVaccine
