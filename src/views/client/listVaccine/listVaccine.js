@@ -21,7 +21,7 @@ const ListVaccines = () => {
 
   const fetchVaccines = async () => {
     const { data, error } = await supabase
-      .from('vaccines_details')
+      .from('vaccines')
       .select('*')
       .order('sn', { ascending: true })
 

@@ -4,7 +4,7 @@ import {
     CButton, CCol, CForm, CFormCheck, CFormInput, CFormSelect, CRow, CCard, CCardHeader
 } from '@coreui/react'
 
-const childRegister = () => {
+const addVaccine = () => {
 
     return (
         <>
@@ -63,4 +63,4 @@ const childRegister = () => {
     )
 }
 
-export default childRegister
+export default addVaccine
