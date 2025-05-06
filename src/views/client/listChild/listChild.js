@@ -20,10 +20,8 @@ const ListChildren = () => {
   const [children, setChildren] = useState([])
   const [hospitalId, setHospitalId] = useState(null)
 
-  // Fetch the logged-in user's hospital_id from profiles
   const fetchUserHospitalId = async () => {
     const { data: { user }, error: userError } = await supabase.auth.getUser()
-
     if (userError || !user) {
       console.error('Error fetching user:', userError)
       return
@@ -42,7 +40,6 @@ const ListChildren = () => {
     }
   }
 
-  // Fetch children for the specific hospital
   const fetchChildren = async () => {
     if (!hospitalId) return
 
@@ -51,13 +48,11 @@ const ListChildren = () => {
       .select(`
         sn,
         child_name,
-        guardian_name,
         guardian_no,
-        child_age,
-        birth_date,
+        date_of_birth,
         gender,
-        hospital_id,
-        hospitals(hospital_name)
+        blood_group,
+        address
       `)
       .eq('hospital_id', hospitalId)
       .order('sn', { ascending: true })
@@ -70,11 +65,7 @@ const ListChildren = () => {
   }
 
   const handleDelete = async (sn) => {
-    const { error } = await supabase
-      .from('children')
-      .delete()
-      .eq('sn', sn)
-
+    const { error } = await supabase.from('children').delete().eq('sn', sn)
     if (error) {
       console.error('Delete error:', error)
     } else {
@@ -103,12 +94,11 @@ const ListChildren = () => {
                   <CIcon icon={cilPeople} />
                 </CTableHeaderCell>
                 <CTableHeaderCell>Child Name</CTableHeaderCell>
-                <CTableHeaderCell>Guardian Name</CTableHeaderCell>
                 <CTableHeaderCell>Guardian No.</CTableHeaderCell>
-                <CTableHeaderCell>Age</CTableHeaderCell>
-                <CTableHeaderCell>Birth Date</CTableHeaderCell>
+                <CTableHeaderCell>Date of Birth</CTableHeaderCell>
                 <CTableHeaderCell>Gender</CTableHeaderCell>
-                <CTableHeaderCell>Hospital</CTableHeaderCell>
+                <CTableHeaderCell>Blood Group</CTableHeaderCell>
+                <CTableHeaderCell>Address</CTableHeaderCell>
                 <CTableHeaderCell>Actions</CTableHeaderCell>
               </CTableRow>
             </CTableHead>
@@ -119,12 +109,11 @@ const ListChildren = () => {
                     <CAvatar size="md" src="https://via.placeholder.com/150" />
                   </CTableDataCell>
                   <CTableDataCell>{child.child_name}</CTableDataCell>
-                  <CTableDataCell>{child.guardian_name}</CTableDataCell>
                   <CTableDataCell>{child.guardian_no}</CTableDataCell>
-                  <CTableDataCell>{child.child_age}</CTableDataCell>
-                  <CTableDataCell>{child.birth_date}</CTableDataCell>
+                  <CTableDataCell>{child.date_of_birth}</CTableDataCell>
                   <CTableDataCell>{child.gender}</CTableDataCell>
-                  <CTableDataCell>{child.hospitals?.hospital_name || 'N/A'}</CTableDataCell>
+                  <CTableDataCell>{child.blood_group}</CTableDataCell>
+                  <CTableDataCell>{child.address}</CTableDataCell>
                   <CTableDataCell>
                     <CButton size="sm" color="primary" className="me-2">
                       View
