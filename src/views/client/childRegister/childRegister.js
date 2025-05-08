@@ -7,14 +7,17 @@ import { toast } from 'react-toastify'
 
 const ChildRegister = () => {
   const [childName, setChildName] = useState('')
-  const [guardianName, setGuardianName] = useState('')
+  const [fatherName, setFatherName] = useState('')
+  const [motherName, setMotherName] = useState('')
   const [guardianNo, setGuardianNo] = useState('')
-  const [childAge, setChildAge] = useState('')
-  const [birthDate, setBirthDate] = useState('')
+  const [dateOfBirth, setDateOfBirth] = useState('')
   const [gender, setGender] = useState('')
+  const [bloodGroup, setBloodGroup] = useState('')
+  const [address, setAddress] = useState('')
+  const [allergies, setAllergies] = useState('')
+  const [medicalConditions, setMedicalConditions] = useState('')
   const [hospitalId, setHospitalId] = useState('')
 
-  // Fetch user's hospital ID from their profile
   useEffect(() => {
     const fetchUserHospitalId = async () => {
       const { data: userData, error: userError } = await supabase.auth.getUser()
@@ -26,8 +29,6 @@ const ChildRegister = () => {
       }
 
       const userId = userData.user.id
-      console.log('User ID:', userId)
-
       const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('hospital_id')
@@ -46,7 +47,6 @@ const ChildRegister = () => {
     fetchUserHospitalId()
   }, [])
 
-  // Form submission
   const handleSubmit = async () => {
     if (!hospitalId) {
       toast.error('Hospital ID is missing. Cannot register child.')
@@ -56,11 +56,15 @@ const ChildRegister = () => {
     const { error } = await supabase.from('children').insert([
       {
         child_name: childName,
-        guardian_name: guardianName,
+        father_name: fatherName,
+        mother_name: motherName,
         guardian_no: guardianNo,
-        child_age: Number(childAge),
-        birth_date: birthDate,
+        date_of_birth: dateOfBirth,
         gender,
+        blood_group: bloodGroup,
+        address,
+        allergies,
+        medical_conditions: medicalConditions,
         hospital_id: hospitalId,
       },
     ])
@@ -70,13 +74,16 @@ const ChildRegister = () => {
       toast.error('Error registering child: ' + error.message)
     } else {
       toast.success('Child registered successfully!')
-      // Reset fields
       setChildName('')
-      setGuardianName('')
+      setFatherName('')
+      setMotherName('')
       setGuardianNo('')
-      setChildAge('')
-      setBirthDate('')
+      setDateOfBirth('')
       setGender('')
+      setBloodGroup('')
+      setAddress('')
+      setAllergies('')
+      setMedicalConditions('')
     }
   }
 
@@ -104,9 +111,18 @@ const ChildRegister = () => {
             <CCol md={6}>
               <CFormInput
                 type="text"
-                label="Guardian Name"
-                value={guardianName}
-                onChange={(e) => setGuardianName(e.target.value)}
+                label="Father's Name"
+                value={fatherName}
+                onChange={(e) => setFatherName(e.target.value)}
+                required
+              />
+            </CCol>
+            <CCol md={6}>
+              <CFormInput
+                type="text"
+                label="Mother's Name"
+                value={motherName}
+                onChange={(e) => setMotherName(e.target.value)}
                 required
               />
             </CCol>
@@ -121,19 +137,10 @@ const ChildRegister = () => {
             </CCol>
             <CCol md={6}>
               <CFormInput
-                type="number"
-                label="Child Age"
-                value={childAge}
-                onChange={(e) => setChildAge(e.target.value)}
-                required
-              />
-            </CCol>
-            <CCol md={6}>
-              <CFormInput
                 type="date"
-                label="Birth Date"
-                value={birthDate}
-                onChange={(e) => setBirthDate(e.target.value)}
+                label="Date of Birth"
+                value={dateOfBirth}
+                onChange={(e) => setDateOfBirth(e.target.value)}
                 required
               />
             </CCol>
@@ -149,6 +156,49 @@ const ChildRegister = () => {
                 <option value="Female">Female</option>
                 <option value="Others">Others</option>
               </CFormSelect>
+            </CCol>
+            <CCol md={6}>
+              <CFormSelect
+                label="Blood Group"
+                value={bloodGroup}
+                onChange={(e) => setBloodGroup(e.target.value)}
+                required
+              >
+                <option value="">-- Select Blood Group --</option>
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+              </CFormSelect>
+            </CCol>
+            <CCol md={6}>
+              <CFormInput
+                type="text"
+                label="Address"
+                value={address}
+                onChange={(e) => setAddress(e.target.value)}
+                required
+              />
+            </CCol>
+            <CCol md={6}>
+              <CFormInput
+                type="text"
+                label="Allergies"
+                value={allergies}
+                onChange={(e) => setAllergies(e.target.value)}
+              />
+            </CCol>
+            <CCol md={6}>
+              <CFormInput
+                type="text"
+                label="Medical Conditions"
+                value={medicalConditions}
+                onChange={(e) => setMedicalConditions(e.target.value)}
+              />
             </CCol>
             <CCol xs={12}>
               <CButton color="primary" type="submit">
