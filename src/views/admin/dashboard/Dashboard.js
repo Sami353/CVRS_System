@@ -31,20 +31,19 @@ const AdminDashboard = () => {
 
   // Fetch hospitals from Supabase
   const fetchHospitals = async () => {
-    setLoading(true);  // Show loading spinner
-    const { data, error } = await supabase
-      .from('hospitals')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error('Error fetching hospitals:', error);  // Check for any errors
-    } else {
-      console.log('Fetched data:', data);  // Log fetched data
-      setHospitals(data);
+      setLoading(true)
+      const { data, error } = await supabase
+        .from('hospital_summary') // fetch from view
+        .select('*')
+        .order('hospital_name', { ascending: true })
+  
+      if (error) {
+        console.error('Error fetching hospital summary:', error)
+      } else {
+        setHospitals(data)
+      }
+      setLoading(false)
     }
-    setLoading(false);  // Hide loading spinner
-  }
 
   // Handle hospital delete
   const handleDelete = async (id) => {
@@ -133,7 +132,7 @@ const AdminDashboard = () => {
                         <CAvatar
                           size="md"
                           src="https://via.placeholder.com/150"
-                          status={hospital.vaccination_opt ? 'success' : 'danger'}
+                          status={hospital.vaccination_facility ? 'success' : 'danger'}
                         />
                       </CTableDataCell>
                       <CTableDataCell>{hospital.hospital_name}</CTableDataCell>
@@ -142,8 +141,8 @@ const AdminDashboard = () => {
                       <CTableDataCell>{hospital.children_registered}</CTableDataCell>
                       <CTableDataCell>{hospital.vaccines_in_stock}</CTableDataCell>
                       <CTableDataCell>
-                        <CBadge color={hospital.vaccination_opt ? 'success' : 'danger'}>
-                          {hospital.vaccination_opt ? 'Opted' : 'Not Opted'}
+                        <CBadge color={hospital.vaccination_facility ? 'success' : 'danger'}>
+                          {hospital.vaccination_facility ? 'Opted' : 'Not Opted'}
                         </CBadge>
                       </CTableDataCell>
                       <CTableDataCell>

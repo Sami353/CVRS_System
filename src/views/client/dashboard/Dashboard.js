@@ -3,8 +3,6 @@ import {
   CAvatar,
   CButton,
   CCard,
-  CCardBody,
-  CCardHeader,
   CCol,
   CRow,
   CTable,
@@ -18,10 +16,13 @@ import CIcon from '@coreui/icons-react'
 import { cilPeople } from '@coreui/icons'
 import supabase from '../../../config/supabaseClient'
 import WidgetsDropdown from '../../../components/widgets/WidgetsDropdown'
+import ChildDetailsModal from '../ChildDetailsModal/ChildDetailsModal'
 
 const Dashboard = () => {
   const [children, setChildren] = useState([])
   const [hospitalId, setHospitalId] = useState(null)
+  const [modalOpen, setModalOpen] = useState(false)
+  const [selectedChild, setSelectedChild] = useState(null)
 
   const fetchUserHospitalId = async () => {
     const { data: userResponse, error: userError } = await supabase.auth.getUser()
@@ -53,17 +54,7 @@ const Dashboard = () => {
 
     const { data, error } = await supabase
       .from('children')
-      .select(`
-        sn,
-        child_name,
-        guardian_name,
-        guardian_no,
-        child_age,
-        birth_date,
-        gender,
-        hospital_id,
-        hospitals(hospital_name)
-      `)
+      .select('*')
       .eq('hospital_id', hospitalId)
       .order('sn', { ascending: true })
 
@@ -107,12 +98,11 @@ const Dashboard = () => {
                     <CIcon icon={cilPeople} />
                   </CTableHeaderCell>
                   <CTableHeaderCell>Child Name</CTableHeaderCell>
-                  <CTableHeaderCell>Guardian Name</CTableHeaderCell>
                   <CTableHeaderCell>Guardian No.</CTableHeaderCell>
-                  <CTableHeaderCell>Age</CTableHeaderCell>
-                  <CTableHeaderCell>Birth Date</CTableHeaderCell>
+                  <CTableHeaderCell>Date of Birth</CTableHeaderCell>
                   <CTableHeaderCell>Gender</CTableHeaderCell>
-                  <CTableHeaderCell>Hospital</CTableHeaderCell>
+                  <CTableHeaderCell>Blood Group</CTableHeaderCell>
+                  <CTableHeaderCell>Address</CTableHeaderCell>
                   <CTableHeaderCell>Actions</CTableHeaderCell>
                 </CTableRow>
               </CTableHead>
@@ -123,14 +113,23 @@ const Dashboard = () => {
                       <CAvatar size="md" src="https://via.placeholder.com/150" />
                     </CTableDataCell>
                     <CTableDataCell>{child.child_name}</CTableDataCell>
-                    <CTableDataCell>{child.guardian_name}</CTableDataCell>
                     <CTableDataCell>{child.guardian_no}</CTableDataCell>
-                    <CTableDataCell>{child.child_age}</CTableDataCell>
-                    <CTableDataCell>{child.birth_date}</CTableDataCell>
+                    <CTableDataCell>{child.date_of_birth}</CTableDataCell>
                     <CTableDataCell>{child.gender}</CTableDataCell>
-                    <CTableDataCell>{child.hospitals?.hospital_name || 'N/A'}</CTableDataCell>
+                    <CTableDataCell>{child.blood_group}</CTableDataCell>
+                    <CTableDataCell>{child.address}</CTableDataCell>
                     <CTableDataCell>
-                      <CButton size="sm" color="primary" className="me-2">View</CButton>
+                      <CButton
+                        size="sm"
+                        color="info"
+                        className="me-2"
+                        onClick={() => {
+                          setSelectedChild(child)
+                          setModalOpen(true)
+                        }}
+                      >
+                        View
+                      </CButton>
                       <CButton size="sm" color="danger" onClick={() => handleDelete(child.sn)}>Delete</CButton>
                     </CTableDataCell>
                   </CTableRow>
@@ -140,6 +139,13 @@ const Dashboard = () => {
           </CCard>
         </CCol>
       </CRow>
+
+      <ChildDetailsModal
+        visible={modalOpen}
+        onClose={() => setModalOpen(false)}
+        child={selectedChild}
+        onDelete={handleDelete}
+      />
     </>
   )
 }

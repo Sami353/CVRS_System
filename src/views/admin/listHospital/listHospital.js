@@ -13,12 +13,12 @@ import {
   CRow,
   CCol,
   CSpinner,
-  CBadge
+  CBadge,
 } from '@coreui/react'
 import CIcon from '@coreui/icons-react'
 import { cilHospital } from '@coreui/icons'
 import supabase from '../../../config/supabaseClient'
-import HospitalDetailsModal from '../HospitalDetailsModal/HospitalDetailsModal' // import reusable modal
+import HospitalDetailsModal from '../HospitalDetailsModal/HospitalDetailsModal'
 
 const ListHospitals = () => {
   const [hospitals, setHospitals] = useState([])
@@ -27,40 +27,33 @@ const ListHospitals = () => {
   const [selectedHospital, setSelectedHospital] = useState(null)
   const [children, setChildren] = useState([])
 
-  // Fetch hospitals
   const fetchHospitals = async () => {
     setLoading(true)
     const { data, error } = await supabase
-      .from('hospitals')
+      .from('hospital_summary') // fetch from view
       .select('*')
-      .order('created_at', { ascending: false })
+      .order('hospital_name', { ascending: true })
 
     if (error) {
-      console.error('Error fetching hospitals:', error)
+      console.error('Error fetching hospital summary:', error)
     } else {
       setHospitals(data)
     }
     setLoading(false)
   }
 
-  // Delete hospital
   const handleDelete = async (id) => {
     const confirm = window.confirm('Are you sure you want to delete this hospital?')
     if (!confirm) return
 
-    const { error } = await supabase
-      .from('hospitals')
-      .delete()
-      .eq('id', id)
-
+    const { error } = await supabase.from('hospitals').delete().eq('id', id)
     if (error) {
       console.error('Error deleting hospital:', error)
     } else {
-      setHospitals(hospitals.filter(h => h.id !== id))
+      setHospitals(hospitals.filter((h) => h.id !== id))
     }
   }
 
-  // Fetch children for modal
   const fetchChildren = async (hospitalId) => {
     const { data, error } = await supabase
       .from('children')
@@ -75,21 +68,16 @@ const ListHospitals = () => {
     }
   }
 
-  // Handle deleting a child in the modal
   const handleDeleteChild = async (childId) => {
     const confirm = window.confirm('Are you sure you want to delete this child?')
     if (!confirm) return
 
-    const { error } = await supabase
-      .from('children')
-      .delete()
-      .eq('sn', childId)
+    const { error } = await supabase.from('children').delete().eq('sn', childId)
 
     if (error) {
       console.error('Error deleting child:', error)
     } else {
-      // Remove the deleted child from the children list
-      setChildren(children.filter(child => child.sn !== childId))
+      setChildren(children.filter((child) => child.sn !== childId))
     }
   }
 
@@ -124,13 +112,13 @@ const ListHospitals = () => {
                   </CTableRow>
                 </CTableHead>
                 <CTableBody>
-                  {hospitals.map(hospital => (
+                  {hospitals.map((hospital) => (
                     <CTableRow key={hospital.id}>
                       <CTableDataCell className="text-center">
                         <CAvatar
                           size="md"
                           src="https://via.placeholder.com/150"
-                          status={hospital.vaccination_opt ? 'success' : 'danger'}
+                          status={hospital.vaccination_facility ? 'success' : 'danger'}
                         />
                       </CTableDataCell>
                       <CTableDataCell>{hospital.hospital_name}</CTableDataCell>
@@ -139,8 +127,8 @@ const ListHospitals = () => {
                       <CTableDataCell>{hospital.children_registered}</CTableDataCell>
                       <CTableDataCell>{hospital.vaccines_in_stock}</CTableDataCell>
                       <CTableDataCell>
-                        <CBadge color={hospital.vaccination_opt ? 'success' : 'danger'}>
-                          {hospital.vaccination_opt ? 'Opted' : 'Not Opted'}
+                        <CBadge color={hospital.vaccination_facility ? 'success' : 'danger'}>
+                          {hospital.vaccination_facility ? 'Opted' : 'Not Opted'}
                         </CBadge>
                       </CTableDataCell>
                       <CTableDataCell>
@@ -179,7 +167,7 @@ const ListHospitals = () => {
         onClose={() => setModalOpen(false)}
         hospital={selectedHospital}
         childrenList={children}
-        onDeleteChild={handleDeleteChild} 
+        onDeleteChild={handleDeleteChild}
       />
     </>
   )
